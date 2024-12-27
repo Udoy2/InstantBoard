@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <cstring>
+#include <cmath>
 // Structure to represent a line segment
 struct Line {
     int x1, y1, x2, y2;
@@ -91,15 +92,80 @@ void drawButton(Button *b) {
     drawText(b->x + 10, b->y + 15, b->label);
 }
 
-// Function to draw color picker
+// Helper function to check if a point is inside a circle
+bool isInsideCircle(int x, int y, int centerX, int centerY, int radius) {
+    int dx = x - centerX;
+    int dy = y - centerY;
+    return (dx * dx + dy * dy) <= (radius * radius);
+}
+
+// Helper function to convert HSV to RGB
+void HSVtoRGB(float h, float s, float v, float& r, float& g, float& b) {
+    if (s == 0) {
+        r = g = b = v;
+        return;
+    }
+
+    h = h * 6.0f; // sector 0 to 5
+    int i = floor(h);
+    float f = h - i; // fractional part of h
+    float p = v * (1 - s);
+    float q = v * (1 - s * f);
+    float t = v * (1 - s * (1 - f));
+
+    switch (i % 6) {
+        case 0: r = v; g = t; b = p; break;
+        case 1: r = q; g = v; b = p; break;
+        case 2: r = p; g = v; b = t; break;
+        case 3: r = p; g = q; b = v; break;
+        case 4: r = t; g = p; b = v; break;
+        case 5: r = v; g = p; b = q; break;
+    }
+}
+
+// Modified color picker drawing function
 void drawColorPicker() {
+    int centerX = 60;  // Center of the color wheel
+    int centerY = 450;
+    int radius = 50;   // Radius of the color wheel
+    int segments = 32; // Number of segments for smooth circle
+
+    // Draw color wheel
+    glBegin(GL_TRIANGLE_FAN);
+    glColor3f(1.0, 1.0, 1.0);  // Center white
+    glVertex2f(centerX, centerY);
+
+    for (int i = 0; i <= segments; i++) {
+        float angle = 2.0f * M_PI * i / segments;
+        float hue = i / (float)segments;
+        float r, g, b;
+        HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
+        glColor3f(r, g, b);
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        glVertex2f(x, y);
+    }
+    glEnd();
+
+    // Draw border
+    glColor3f(0.0, 0.0, 0.0);
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i <= segments; i++) {
+        float angle = 2.0f * M_PI * i / segments;
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        glVertex2f(x, y);
+    }
+    glEnd();
     glBegin(GL_QUADS);
-    glColor3f(1.0, 0.0, 0.0); glVertex2i(10, 500);
-    glColor3f(0.0, 1.0, 0.0); glVertex2i(110, 500);
-    glColor3f(0.0, 0.0, 1.0); glVertex2i(110, 400);
-    glColor3f(1.0, 1.0, 0.0); glVertex2i(10, 400);
+    glColor3fv(currentColor);
+    glVertex2i(10, 520);
+    glVertex2i(110, 520);
+    glVertex2i(110, 550);
+    glVertex2i(10, 550);
     glEnd();
 }
+
 
 // Function to draw all strokes
 void drawStrokes() {
@@ -134,14 +200,30 @@ void handleButtonClick(int x, int y) {
     }
 }
 
-// Function to handle color picker clicks
 void handleColorPickerClick(int x, int y) {
-    if (x > 10 && x < 110 && y > 400 && y < 500) {
-        float dx = (float)(x - 10) / 100.0;
-        float dy = (float)(y - 400) / 100.0;
-        currentColor[0] = dx;
-        currentColor[1] = dy;
-        currentColor[2] = 1.0 - dx;
+    int centerX = 60;
+    int centerY = 450;
+    int radius = 50;
+
+    if (isInsideCircle(x, y, centerX, centerY, radius)) {
+        // Calculate angle and distance from center
+        float dx = x - centerX;
+        float dy = y - centerY;
+        float angle = atan2(dy, dx);
+        if (angle < 0) angle += 2 * M_PI;
+
+        float distance = sqrt(dx * dx + dy * dy);
+        float saturation = std::min(distance / radius, 1.0f);
+
+        // Convert angle to hue (0-1)
+        float hue = angle / (2 * M_PI);
+
+        // Convert HSV to RGB
+        HSVtoRGB(hue, saturation, 1.0f,
+                 currentColor[0],
+                 currentColor[1],
+                 currentColor[2]);
+        glutPostRedisplay();
     }
 }
 
