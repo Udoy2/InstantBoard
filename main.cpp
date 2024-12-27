@@ -157,6 +157,13 @@ void drawColorPicker() {
         glVertex2f(x, y);
     }
     glEnd();
+    glBegin(GL_QUADS);
+    glColor3fv(currentColor);
+    glVertex2i(10, 520);
+    glVertex2i(110, 520);
+    glVertex2i(110, 550);
+    glVertex2i(10, 550);
+    glEnd();
 }
 
 
@@ -216,6 +223,7 @@ void handleColorPickerClick(int x, int y) {
                  currentColor[0],
                  currentColor[1],
                  currentColor[2]);
+        glutPostRedisplay();
     }
 }
 
