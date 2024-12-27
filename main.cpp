@@ -149,7 +149,7 @@ void drawColorPicker() {
 
     // Draw border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);
+    glBegin(GL_LINE);
     for (int i = 0; i <= segments; i++) {
         float angle = 2.0f * M_PI * i / segments;
         float x = centerX + radius * cos(angle);
