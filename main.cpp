@@ -48,16 +48,24 @@ void clearScreen() {
 }
 void increasePointSize() { if (pointSize < 50) pointSize++; glutPostRedisplay(); }
 void decreasePointSize() { if (pointSize > 1) pointSize--; glutPostRedisplay(); }
+void undoLastStroke() {
+    if (!strokes.empty()) {
+        strokes.pop_back();
+        glutPostRedisplay();
+    }
+}
 
 // Define buttons
 Button buttons[] = {
     {10, 40, 100, 25, "PENCIL (P)", setPencilTool},
     {10, 80, 100, 25, "ERASER (E)", setEraserTool},
-    {10, 120, 100, 25, "CLEAR", clearScreen},
-    {30, 180, 30, 25, "+", increasePointSize},
-    {70, 180, 30, 25, "-", decreasePointSize}
+    {10, 120, 100, 25, "UNDO (U)", undoLastStroke}, // Undo button added here
+    {10, 160, 100, 25, "CLEAR", clearScreen},
+    {30, 200, 30, 25, "+", increasePointSize}, // Moved to the end
+    {70, 200, 30, 25, "-", decreasePointSize}  // Moved to the end
 };
-int numButtons = 5;
+int numButtons = 6;
+
 
 // Function to draw text
 void drawText(int x, int y, const char *text) {
@@ -80,7 +88,7 @@ void drawButton(Button *b) {
 
     // Draw button border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);  // Fixed: Changed GL_LINE to GL_LINE_LOOP
+    glBegin(GL_LINE);  // Fixed: Changed GL_LINE to GL_LINE
     glVertex2i(b->x, b->y);
     glVertex2i(b->x + b->w, b->y);
     glVertex2i(b->x + b->w, b->y + b->h);
@@ -90,6 +98,7 @@ void drawButton(Button *b) {
     // Draw button label
     glColor3f(0.0, 0.0, 0.0);
     drawText(b->x + 10, b->y + 15, b->label);
+
 }
 
 // Helper function to check if a point is inside a circle
@@ -149,7 +158,7 @@ void drawColorPicker() {
 
     // Draw border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);  // Fixed: Changed GL_LINE to GL_LINE_LOOP
+    glBegin(GL_LINE);  // Fixed: Changed GL_LINE to GL_LINE
     for (int i = 0; i <= segments; i++) {
         float angle = 2.0f * M_PI * i / segments;
         float x = centerX + radius * cos(angle);
@@ -238,8 +247,12 @@ void keyboard(unsigned char key, int x, int y) {
             setEraserTool();
             glutPostRedisplay();
             break;
+        case 'u':  // Undo functionality
+            undoLastStroke();
+            break;
     }
 }
+
 
 // Mouse button callback
 void mouseButton(int button, int state, int x, int y) {
@@ -319,7 +332,7 @@ void display() {
 
     std::stringstream ss;
     ss << pointSize;
-    drawText(10, 195, ss.str().c_str());
+    drawText(10, 215, ss.str().c_str());
 
     for (int i = 0; i < numButtons; i++) {
         drawButton(&buttons[i]);
