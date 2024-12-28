@@ -80,7 +80,7 @@ void drawButton(Button *b) {
 
     // Draw button border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);  // Fixed: Changed GL_LINE to GL_LINE_LOOP
+    glBegin(GL_LINE);  // Fixed: Changed GL_LINE to GL_LINE
     glVertex2i(b->x, b->y);
     glVertex2i(b->x + b->w, b->y);
     glVertex2i(b->x + b->w, b->y + b->h);
@@ -149,7 +149,7 @@ void drawColorPicker() {
 
     // Draw border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);  // Fixed: Changed GL_LINE to GL_LINE_LOOP
+    glBegin(GL_LINE);  // Fixed: Changed GL_LINE to GL_LINE
     for (int i = 0; i <= segments; i++) {
         float angle = 2.0f * M_PI * i / segments;
         float x = centerX + radius * cos(angle);
