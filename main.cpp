@@ -312,7 +312,22 @@ void mouseMotion(int x, int y) {
         prevY = y;
     }
 }
+void reshape(int w, int h) {
+    // Update the window size variables
+    windowWidth = w;
+    windowHeight = h;
 
+    // Update the OpenGL viewport
+    glViewport(0, 0, w, h);
+
+    // Adjust the projection matrix to match the new window size
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0, windowWidth, windowHeight, 0.0);
+
+    // Redraw the window with the updated size
+    glutPostRedisplay();
+}
 // Display callback
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -360,6 +375,8 @@ int main(int argc, char **argv) {
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(windowWidth, windowHeight);
     glutCreateWindow("Whiteboard with Vector Storage");
+    // Set the reshape callback
+    glutReshapeFunc(reshape);
     init();
     glutDisplayFunc(display);
     glutMouseFunc(mouseButton);
