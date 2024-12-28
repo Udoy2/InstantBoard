@@ -51,8 +51,8 @@ void decreasePointSize() { if (pointSize > 1) pointSize--; glutPostRedisplay(); 
 
 // Define buttons
 Button buttons[] = {
-    {10, 40, 100, 25, "PENCIL", setPencilTool},
-    {10, 80, 100, 25, "ERASER", setEraserTool},
+    {10, 40, 100, 25, "PENCIL (P)", setPencilTool},
+    {10, 80, 100, 25, "ERASER (E)", setEraserTool},
     {10, 120, 100, 25, "CLEAR", clearScreen},
     {30, 180, 30, 25, "+", increasePointSize},
     {70, 180, 30, 25, "-", decreasePointSize}
@@ -80,7 +80,7 @@ void drawButton(Button *b) {
 
     // Draw button border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE);
+    glBegin(GL_LINE_LOOP);  // Fixed: Changed GL_LINE to GL_LINE_LOOP
     glVertex2i(b->x, b->y);
     glVertex2i(b->x + b->w, b->y);
     glVertex2i(b->x + b->w, b->y + b->h);
@@ -149,7 +149,7 @@ void drawColorPicker() {
 
     // Draw border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);
+    glBegin(GL_LINE_LOOP);  // Fixed: Changed GL_LINE to GL_LINE_LOOP
     for (int i = 0; i <= segments; i++) {
         float angle = 2.0f * M_PI * i / segments;
         float x = centerX + radius * cos(angle);
@@ -157,6 +157,8 @@ void drawColorPicker() {
         glVertex2f(x, y);
     }
     glEnd();
+
+    // Draw current color preview
     glBegin(GL_QUADS);
     glColor3fv(currentColor);
     glVertex2i(10, 520);
@@ -166,10 +168,8 @@ void drawColorPicker() {
     glEnd();
 }
 
-
 // Function to draw all strokes
 void drawStrokes() {
-    // Replace range-based for loops with traditional for loops
     for (size_t i = 0; i < strokes.size(); i++) {
         const Stroke& stroke = strokes[i];
         for (size_t j = 0; j < stroke.lines.size(); j++) {
@@ -224,6 +224,20 @@ void handleColorPickerClick(int x, int y) {
                  currentColor[1],
                  currentColor[2]);
         glutPostRedisplay();
+    }
+}
+
+// Keyboard callback function
+void keyboard(unsigned char key, int x, int y) {
+    switch (tolower(key)) {
+        case 'p':
+            setPencilTool();
+            glutPostRedisplay();
+            break;
+        case 'e':
+            setEraserTool();
+            glutPostRedisplay();
+            break;
     }
 }
 
@@ -337,6 +351,7 @@ int main(int argc, char **argv) {
     glutDisplayFunc(display);
     glutMouseFunc(mouseButton);
     glutMotionFunc(mouseMotion);
+    glutKeyboardFunc(keyboard);  // Added keyboard callback
     glutMainLoop();
     return 0;
 }
