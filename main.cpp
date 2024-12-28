@@ -135,7 +135,7 @@ void HSVtoRGB(float h, float s, float v, float& r, float& g, float& b) {
 // Modified color picker drawing function
 void drawColorPicker() {
     int centerX = 60;  // Center of the color wheel
-    int centerY = 450;
+    int centerY = windowHeight - 150;
     int radius = 50;   // Radius of the color wheel
     int segments = 32; // Number of segments for smooth circle
 
@@ -170,10 +170,10 @@ void drawColorPicker() {
     // Draw current color preview
     glBegin(GL_QUADS);
     glColor3fv(currentColor);
-    glVertex2i(10, 520);
-    glVertex2i(110, 520);
-    glVertex2i(110, 550);
-    glVertex2i(10, 550);
+    glVertex2i(10, windowHeight-80);
+    glVertex2i(110, windowHeight-80);
+    glVertex2i(110, windowHeight-50);
+    glVertex2i(10, windowHeight-50);
     glEnd();
 }
 
@@ -211,7 +211,7 @@ void handleButtonClick(int x, int y) {
 
 void handleColorPickerClick(int x, int y) {
     int centerX = 60;
-    int centerY = 450;
+    int centerY = windowHeight - 150;
     int radius = 50;
 
     if (isInsideCircle(x, y, centerX, centerY, radius)) {
