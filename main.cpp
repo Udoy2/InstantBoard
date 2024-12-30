@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstring>
 #include <cmath>
+
 // Structure to represent a line segment
 struct Line {
     int x1, y1, x2, y2;
@@ -59,13 +60,12 @@ void undoLastStroke() {
 Button buttons[] = {
     {10, 40, 100, 25, "PENCIL (P)", setPencilTool},
     {10, 80, 100, 25, "ERASER (E)", setEraserTool},
-    {10, 120, 100, 25, "UNDO (U)", undoLastStroke}, // Undo button added here
+    {10, 120, 100, 25, "UNDO (U)", undoLastStroke},
     {10, 160, 100, 25, "CLEAR", clearScreen},
-    {30, 200, 30, 25, "+", increasePointSize}, // Moved to the end
-    {70, 200, 30, 25, "-", decreasePointSize}  // Moved to the end
+    {30, 200, 30, 25, "+", increasePointSize},
+    {70, 200, 30, 25, "-", decreasePointSize}
 };
 int numButtons = 6;
-
 
 // Function to draw text
 void drawText(int x, int y, const char *text) {
@@ -88,7 +88,7 @@ void drawButton(Button *b) {
 
     // Draw button border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE);  // Fixed: Changed GL_LINE to GL_LINE
+    glBegin(GL_LINE_LOOP);  // Changed from GL_LINE to GL_LINE_LOOP
     glVertex2i(b->x, b->y);
     glVertex2i(b->x + b->w, b->y);
     glVertex2i(b->x + b->w, b->y + b->h);
@@ -98,7 +98,6 @@ void drawButton(Button *b) {
     // Draw button label
     glColor3f(0.0, 0.0, 0.0);
     drawText(b->x + 10, b->y + 15, b->label);
-
 }
 
 // Helper function to check if a point is inside a circle
@@ -158,7 +157,7 @@ void drawColorPicker() {
 
     // Draw border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE);  // Fixed: Changed GL_LINE to GL_LINE
+    glBegin(GL_LINE_LOOP);  // Changed from GL_LINE to GL_LINE_LOOP
     for (int i = 0; i <= segments; i++) {
         float angle = 2.0f * M_PI * i / segments;
         float x = centerX + radius * cos(angle);
@@ -247,12 +246,11 @@ void keyboard(unsigned char key, int x, int y) {
             setEraserTool();
             glutPostRedisplay();
             break;
-        case 'u':  // Undo functionality
+        case 'u':
             undoLastStroke();
             break;
     }
 }
-
 
 // Mouse button callback
 void mouseButton(int button, int state, int x, int y) {
@@ -312,6 +310,7 @@ void mouseMotion(int x, int y) {
         prevY = y;
     }
 }
+
 void reshape(int w, int h) {
     // Update the window size variables
     windowWidth = w;
@@ -328,6 +327,7 @@ void reshape(int w, int h) {
     // Redraw the window with the updated size
     glutPostRedisplay();
 }
+
 // Display callback
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -375,13 +375,12 @@ int main(int argc, char **argv) {
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(windowWidth, windowHeight);
     glutCreateWindow("Whiteboard with Vector Storage");
-    // Set the reshape callback
     glutReshapeFunc(reshape);
     init();
     glutDisplayFunc(display);
     glutMouseFunc(mouseButton);
     glutMotionFunc(mouseMotion);
-    glutKeyboardFunc(keyboard);  // Added keyboard callback
+    glutKeyboardFunc(keyboard);
     glutMainLoop();
     return 0;
 }
