@@ -19,24 +19,18 @@ void toggleSidebar() {
     glutIdleFunc(animateSidebar);
 }
 
-
 void animateSidebar() {
     float targetPosition = isSidebarVisible ? 0.0f : -120.0f;
     float epsilon = 0.1f;
 
     if (std::abs(sidebarPosition - targetPosition) > epsilon) {
-        sidebarPosition += (targetPosition - sidebarPosition) * 0.15f;
+        sidebarPosition += (targetPosition - sidebarPosition) * 0.02f; // Reduce step size for slower animation
         glutPostRedisplay();
     } else {
         sidebarPosition = targetPosition;
-        glutIdleFunc(NULL);
+        glutIdleFunc(NULL); // Stop the animation once it reaches the target
     }
 }
-
-
-
-
-
 
 // Structure to represent a line segment
 struct Line {
@@ -105,7 +99,6 @@ Button buttons[] = {
 };
 int numButtons = 8; // Updated button count
 
-
 Button smallToggleButton = {5, 10, 30, 25, ">", toggleSidebar};
 
 // Function to draw text
@@ -113,6 +106,19 @@ void drawText(int x, int y, const char *text) {
     glRasterPos2i(x, y);
     while (*text) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *text++);
+    }
+}
+
+void drawBoldText(int x, int y, const char *text, int boldness) {
+    // Draw text multiple times with slight offsets
+    for (int dx = -boldness; dx <= boldness; ++dx) {
+        for (int dy = -boldness; dy <= boldness; ++dy) {
+            glRasterPos2i(x + dx, y + dy);
+            const char *p;
+            for (p = text; *p; p++) {
+                glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *p);
+            }
+        }
     }
 }
 
@@ -263,13 +269,6 @@ void handleButtonClick(int x, int y) {
     }
 }
 
-
-
-
-
-
-
-
 void handleColorPickerClick(int x, int y) {
     int centerX = 60;
     int centerY = windowHeight - 150;
@@ -317,7 +316,6 @@ void keyboard(unsigned char key, int x, int y) {
             break;
     }
 }
-
 
 // Mouse button callback
 void mouseButton(int button, int state, int x, int y) {
@@ -378,7 +376,6 @@ void mouseButton(int button, int state, int x, int y) {
     }
 }
 
-
 void display();
 
 // Mouse motion callback
@@ -436,9 +433,6 @@ void mouseMotion(int x, int y) {
     }
 }
 
-
-
-
 void reshape(int w, int h) {
     // Update the window size variables
     windowWidth = w;
@@ -460,7 +454,7 @@ void reshape(int w, int h) {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Draw sidebar background
+    // Draw sidebar background based on sidebarPosition
     glColor3f(0.09, 0.08, 0.23);
     glBegin(GL_QUADS);
     glVertex2i(sidebarPosition, 0);
@@ -469,36 +463,40 @@ void display() {
     glVertex2i(sidebarPosition, windowHeight);
     glEnd();
 
+    // Calculate alpha value based on sidebarPosition for fade-in effect
+    float alpha = (sidebarPosition + 120.0f) / 120.0f; // Interpolate from 0 to 1
+
+    // Draw UI elements based on sidebarPosition only if sidebar is visible
     if (isSidebarVisible) {
-        glColor3f(1.0, 1.0, 1.0);
-        drawText(10 + sidebarPosition, 170, "SIZE");
+        glColor4f(1.0, 1.0, 1.0, alpha);
+
         std::stringstream ss;
         ss << pointSize;
-        drawText(10 + sidebarPosition, 215, ss.str().c_str());
 
-        // Draw buttons with adjusted positions
+        // Draw the point size text to the left of the plus button, using bold effect
+        glColor4f(1.0, 1.0, 1.0, alpha); // Set text color with alpha
+        drawBoldText(10 + sidebarPosition, 257, ss.str().c_str(), 0.5); // Use bold text function
+
+        // Ensure plus and minus buttons are drawn with fade-in effect
         for (int i = 0; i < numButtons; i++) {
-            Button tempButton = buttons[i];
-            tempButton.x += sidebarPosition;
-            drawButton(&tempButton);
+            glColor4f(1.0, 1.0, 1.0, alpha); // Set button color with alpha
+            drawButton(&buttons[i]);
         }
+
+        // Label the plus and minus buttons
+        glColor4f(1.0, 1.0, 1.0, alpha); // Set label color with alpha
         drawColorPicker();
     } else {
-        // Draw small toggle button with adjusted position
-        Button tempButton = smallToggleButton;
-        tempButton.x = sidebarPosition + 120;
-        drawButton(&tempButton);
+        // Draw the small toggle button with fade-in effect
+        glColor4f(1.0, 1.0, 1.0, alpha); // Set button color with alpha
+        drawButton(&smallToggleButton);
     }
 
+    // Draw all strokes
     drawStrokes();
+
     glFlush();
 }
-
-
-
-
-
-
 
 
 // Initialize OpenGL settings
