@@ -71,7 +71,6 @@ void undoLastStroke() {
     }
 }
 
-// Define buttons
 Button buttons[] = {
     {10, 10, 100, 25, "CLOSE", toggleSidebar},
     {10, 40, 100, 25, "PENCIL (P)", setPencilTool},
@@ -140,7 +139,7 @@ void drawButton(Button *b) {
     // Save current line width
     GLfloat currentWidth;
     glGetFloatv(GL_LINE_WIDTH, &currentWidth);
-    
+
     // Set line width for border
     glLineWidth(1.0);
 
@@ -566,7 +565,7 @@ void display() {
         // Draw point size text
         std::stringstream ss;
         ss  << pointSize;  // Added "Size:" label for clarity
-        
+
         // Position the text above the +/- buttons
         glColor4f(1.0, 1.0, 1.0, alpha); // Set text color with alpha
         drawBoldText(10 + sidebarPosition, 298, ss.str().c_str(), 0.5);
