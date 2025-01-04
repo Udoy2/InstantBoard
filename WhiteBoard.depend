@@ -228,7 +228,7 @@
 	<cstring>
 	<cmath>
 
-1735911407 source:c:\users\user\instantboard\main.cpp
+1735975154 source:c:\users\user\instantboard\main.cpp
 	<GL/gl.h>
 	<GL/glu.h>
 	<GL/glut.h>
@@ -236,4 +236,8 @@
 	<vector>
 	<cstring>
 	<cmath>
+	<math.h>
+
+1341006774 c:\program files (x86)\codeblocks\mingw\include\math.h
+	<_mingw.h>
 

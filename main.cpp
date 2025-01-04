@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstring>
 #include <cmath>
+#include <math.h>
 
 template <typename T>
 std::string toString(T value)
@@ -13,6 +14,14 @@ std::string toString(T value)
     os << value;
     return os.str();
 }
+
+const int BOTTOM_TOOLBAR_HEIGHT = 60;
+const int BOTTOM_BUTTON_WIDTH = 80;
+const int BOTTOM_BUTTON_HEIGHT = 40;
+const int BOTTOM_BUTTON_SPACING = 20;
+const int BOTTOM_MARGIN = 20;
+const int BOTTOM_BUTTON_SIZE = 40;  // Add this line
+
 
 
 // Update the sidebar and thumbnail dimensions
@@ -24,6 +33,7 @@ const int THUMBNAIL_WIDTH = 180;      // Increased from 120 to 160
 float scrollOffset = 0.0f;
 const float SCROLL_SPEED = 20.0f;
 int totalContentHeight = 0;
+int selectedBottomTool = 1; // Track currently selected bottom tool (1 for pencil by default)
 
 // Variables for mouse state
 int prevX = -1, prevY = -1;
@@ -93,14 +103,18 @@ typedef struct
 } Button;
 
 // Button callback functions
-void setPencilTool()
-{
+void setPencilTool() {
     tool = 1;
+    selectedBottomTool = 0;
+    glutPostRedisplay();
 }
-void setEraserTool()
-{
+
+void setEraserTool() {
     tool = 2;
+    selectedBottomTool = 1;
+    glutPostRedisplay();
 }
+
 void setCircleTool()
 {
     tool = 3;
@@ -120,12 +134,15 @@ void clearScreen()
 static bool canAdjustSize = true;
 const int COOLDOWN_MS = 200;  // 200ms cooldown
 
-void resetSizeAdjustFlag(int value) {
+void resetSizeAdjustFlag(int value)
+{
     canAdjustSize = true;
 }
 
-void increasePointSize() {
-    if (canAdjustSize && pointSize < 50) {
+void increasePointSize()
+{
+    if (canAdjustSize && pointSize < 50)
+    {
         pointSize++;
         canAdjustSize = false;
         glutTimerFunc(COOLDOWN_MS, resetSizeAdjustFlag, 0);
@@ -133,8 +150,10 @@ void increasePointSize() {
     }
 }
 
-void decreasePointSize() {
-    if (canAdjustSize && pointSize > 1) {
+void decreasePointSize()
+{
+    if (canAdjustSize && pointSize > 1)
+    {
         pointSize--;
         canAdjustSize = false;
         glutTimerFunc(COOLDOWN_MS, resetSizeAdjustFlag, 0);
@@ -154,9 +173,56 @@ void undoLastStroke()
     }
 }
 
+void deleteCurrentBoard()
+{
+    // If only one board exists, act like clear button
+    if (boards.size() == 1)
+    {
+        clearScreen();
+        return;
+    }
+
+    // For multiple boards:
+    // Save states of all boards except current one
+    std::vector<Board> tempBoards;
+    for (size_t i = 0; i < boards.size(); i++)
+    {
+        if (i != currentBoardIndex)
+        {
+            tempBoards.push_back(boards[i]);
+        }
+    }
+
+    // Update boards vector
+    boards = tempBoards;
+
+    // Switch to previous board
+    currentBoardIndex = std::max(0, currentBoardIndex - 1);
+
+    // Load the previous board's state
+    strokes = boards[currentBoardIndex].strokes;
+    pointSize = boards[currentBoardIndex].pointSize;
+    memcpy(currentColor, boards[currentBoardIndex].currentColor, sizeof(float) * 3);
+    tool = boards[currentBoardIndex].tool;
+
+    // Update scroll and content height
+    totalContentHeight = (boards.size() * (THUMBNAIL_HEIGHT + 30)) + 35;
+
+    glutPostRedisplay();
+}
+
+void drawText(int x, int y, const char *text)
+{
+    glRasterPos2i(x, y);
+    while (*text)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *text++);
+    }
+}
+
 Button buttons[] =
 {
-    {10, 10, 100, 25, "CLOSE", toggleSidebar},
+    {10, 10, 100, 25, "<<", toggleSidebar},
     {10, 40, 100, 25, "PENCIL (P)", setPencilTool},
     {10, 80, 100, 25, "ERASER (E)", setEraserTool},
     {10, 120, 100, 25, "CIRCLE (C)", setCircleTool},
@@ -170,16 +236,182 @@ Button buttons[] =
 };
 int numButtons = 10;
 
-Button smallToggleButton = {5, 10, 30, 25, ">", toggleSidebar};
-
-void drawText(int x, int y, const char *text)
+// Use the existing Button struct for bottom buttons
+Button bottomButtons[] =
 {
-    glRasterPos2i(x, y);
-    while (*text)
+    {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", setPencilTool},
+    {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", setEraserTool},
+    {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", clearScreen},
+    {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", deleteCurrentBoard}
+};
+const int NUM_BOTTOM_BUTTONS = 4;
+
+// Function to draw the rotated clear button icon
+void drawRotatedClearButtonIcon(Button* b)
+{
+    glPushMatrix();
+    glTranslatef(b->x + 20, b->y + 20, 0);
+    glRotatef(45.0f, 0, 0, 1);
+    glTranslatef(-(b->x + 20), -(b->y + 20), 0);
+
+    // Draw larger triangle (flipped vertically)
+    glBegin(GL_TRIANGLES);
+    glVertex2i(b->x + 10, b->y + 30); // Bottom left
+    glVertex2i(b->x + 30, b->y + 30); // Bottom right
+    glVertex2i(b->x + 20, b->y + 10); // Top center
+    glEnd();
+
+    // Draw larger line upon the triangle
+    glBegin(GL_LINES);
+    glVertex2i(b->x + 16, b->y + 10); // Line start
+    glVertex2i(b->x + 24, b->y + 10); // Line end
+    glEnd();
+
+    // Draw 2 larger white lines inside the triangle
+    glColor3f(1.0, 1.0, 1.0); // White color
+    glBegin(GL_LINES);
+    glVertex2i(b->x + 14, b->y + 20); // First line start
+    glVertex2i(b->x + 18, b->y + 20); // First line end
+
+    glVertex2i(b->x + 22, b->y + 20); // Second line start
+    glVertex2i(b->x + 26, b->y + 20); // Second line end
+    glEnd();
+
+    glPopMatrix();
+}
+
+void drawIcon(Button* b, int iconType)
+{
+    glColor3f(0.0, 0.0, 0.0);
+    glLineWidth(2.0);
+
+    switch(iconType)
     {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *text++);
+    case 0: // Pencil (head downwards and more pointed)
+        // Pencil body
+        glBegin(GL_QUADS);
+        glVertex2i(b->x + 16, b->y + 12);
+        glVertex2i(b->x + 24, b->y + 12);
+        glVertex2i(b->x + 24, b->y + 28);
+        glVertex2i(b->x + 16, b->y + 28);
+        glEnd();
+
+        // Pencil tip
+        glBegin(GL_TRIANGLES);
+        glVertex2i(b->x + 16, b->y + 12);
+        glVertex2i(b->x + 20, b->y + 4);
+        glVertex2i(b->x + 24, b->y + 12);
+        glEnd();
+        break;
+
+    case 1: // Eraser
+        // Draw rectangle part
+        glBegin(GL_QUADS);
+        glVertex2i(b->x + 12, b->y + 15);
+        glVertex2i(b->x + 28, b->y + 15);
+        glVertex2i(b->x + 28, b->y + 25);
+        glVertex2i(b->x + 12, b->y + 25);
+        glEnd();
+// Draw rounded part
+        glBegin(GL_POLYGON);
+        for (int i = 0; i <= 360; i++)
+        {
+            float theta = i * 3.14159 / 180;
+            glVertex2f(b->x + 10 + 2 * cos(theta), b->y + 20 + 5 * sin(theta));
+        }
+        glEnd();
+        break;
+
+    case 2: // Clear (cleaning brush icon)
+        drawRotatedClearButtonIcon(b); // Draw the larger clear button icon at a fixed 45 degree angle with white lines
+        break;
+
+    case 3: // Delete (trash can with lid)
+        // Lid
+        glBegin(GL_LINE_STRIP);
+        glVertex2i(b->x + 12, b->y + 15);
+        glVertex2i(b->x + 28, b->y + 15);
+        // Can
+        glVertex2i(b->x + 26, b->y + 30);
+        glVertex2i(b->x + 14, b->y + 30);
+        glVertex2i(b->x + 12, b->y + 15);
+        glEnd();
+
+        // Vertical lines inside can
+        glBegin(GL_LINES);
+        glVertex2i(b->x + 17, b->y + 18);
+        glVertex2i(b->x + 17, b->y + 27);
+        glVertex2i(b->x + 20, b->y + 18);
+        glVertex2i(b->x + 20, b->y + 27);
+        glVertex2i(b->x + 23, b->y + 18);
+        glVertex2i(b->x + 23, b->y + 27);
+        glEnd();
+        break;
     }
 }
+
+void drawButton(Button *b);
+
+
+// Modify drawBottomToolbar function
+void drawBottomToolbar() {
+    for (int i = 0; i < NUM_BOTTOM_BUTTONS; i++) {
+        // Draw button background
+        bool isSelected = false;
+
+        // Check if button should be highlighted
+        if (i == 0) isSelected = (tool == 1); // Pencil
+        if (i == 1) isSelected = (tool == 2); // Eraser
+
+        // Set background color based on selection state
+        if (isSelected) {
+            glColor3f(1.0, 0.7, 0.6); // Darker highlight color
+        } else {
+            glColor3f(1.0, 0.84, 0.77); // Original color
+        }
+
+        // Draw button background
+        glBegin(GL_QUADS);
+        glVertex2i(bottomButtons[i].x, bottomButtons[i].y);
+        glVertex2i(bottomButtons[i].x + bottomButtons[i].w, bottomButtons[i].y);
+        glVertex2i(bottomButtons[i].x + bottomButtons[i].w, bottomButtons[i].y + bottomButtons[i].h);
+        glVertex2i(bottomButtons[i].x, bottomButtons[i].y + bottomButtons[i].h);
+        glEnd();
+
+        // Draw border with thicker line for selected state
+        glLineWidth(isSelected ? 2.0 : 1.0);
+        glColor3f(0.0, 0.0, 0.0);
+        glBegin(GL_LINE_LOOP);
+        glVertex2i(bottomButtons[i].x, bottomButtons[i].y);
+        glVertex2i(bottomButtons[i].x + bottomButtons[i].w, bottomButtons[i].y);
+        glVertex2i(bottomButtons[i].x + bottomButtons[i].w, bottomButtons[i].y + bottomButtons[i].h);
+        glVertex2i(bottomButtons[i].x, bottomButtons[i].y + bottomButtons[i].h);
+        glEnd();
+        glLineWidth(1.0);
+
+        // Draw the icon
+        drawIcon(&bottomButtons[i], i);
+    }
+}
+
+
+
+void updateBottomButtonPositions()
+{
+    int totalWidth = NUM_BOTTOM_BUTTONS * BOTTOM_BUTTON_SIZE +
+                     (NUM_BOTTOM_BUTTONS - 1) * BOTTOM_BUTTON_SPACING;
+    int startX = (windowWidth - totalWidth) / 2;
+
+    for (int i = 0; i < NUM_BOTTOM_BUTTONS; i++)
+    {
+        bottomButtons[i].x = startX + i * (BOTTOM_BUTTON_SIZE + BOTTOM_BUTTON_SPACING);
+        bottomButtons[i].y = windowHeight - BOTTOM_MARGIN - BOTTOM_BUTTON_SIZE;
+    }
+}
+
+Button smallToggleButton = {5, 10, 30, 25, ">", toggleSidebar};
+
+
 
 void createNewBoard()
 {
@@ -552,6 +784,22 @@ void drawStrokes()
 // Function to check button click
 void handleButtonClick(int x, int y)
 {
+    if (y >= windowHeight - BOTTOM_MARGIN - BOTTOM_BUTTON_HEIGHT &&
+            y <= windowHeight - BOTTOM_MARGIN)
+    {
+        for (int i = 0; i < NUM_BOTTOM_BUTTONS; i++)
+        {
+            if (x >= bottomButtons[i].x && x <= bottomButtons[i].x + bottomButtons[i].w)
+            {
+                if (bottomButtons[i].callbackFunction)
+                {
+                    bottomButtons[i].callbackFunction();
+                }
+                return;
+            }
+        }
+    }
+
     // Left sidebar handling
     if (isSidebarVisible)
     {
@@ -919,24 +1167,20 @@ void mouseMotion(int x, int y)
 }
 
 
+// Add to reshape function
 void reshape(int w, int h)
 {
-    // Update the window size variables
     windowWidth = w;
     windowHeight = h;
+    updateBottomButtonPositions();
 
-    // Update the OpenGL viewport
     glViewport(0, 0, w, h);
-
-    // Adjust the projection matrix to match the new window size
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0.0, windowWidth, windowHeight, 0.0);
 
-    // Redraw the window with the updated size
     glutPostRedisplay();
 }
-
 // Display callback
 void display()
 {
@@ -1046,6 +1290,12 @@ void display()
         drawButton(&toggleRightButton);
     }
 
+    for (int i = 0; i < NUM_BOTTOM_BUTTONS; i++)
+    {
+        drawButton(&bottomButtons[i]);
+    }
+
+    drawBottomToolbar();
     glFlush();
 }
 
@@ -1068,8 +1318,7 @@ void init()
     rightSidebarPosition = RIGHT_SIDEBAR_WIDTH;  // Set initial position to closed state
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(windowWidth, windowHeight);
@@ -1082,8 +1331,7 @@ int main(int argc, char **argv)
     glutMotionFunc(mouseMotion);
     glutKeyboardFunc(keyboard);
 
-    init();  // Initialize with single board
+    init();
     glutMainLoop();
     return 0;
 }
-
