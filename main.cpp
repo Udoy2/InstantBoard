@@ -20,14 +20,12 @@ const int BOTTOM_BUTTON_WIDTH = 80;
 const int BOTTOM_BUTTON_HEIGHT = 40;
 const int BOTTOM_BUTTON_SPACING = 20;
 const int BOTTOM_MARGIN = 20;
-const int BOTTOM_BUTTON_SIZE = 40;  // Add this line
-
-
+const int BOTTOM_BUTTON_SIZE = 40; // Add this line
 
 // Update the sidebar and thumbnail dimensions
-const int RIGHT_SIDEBAR_WIDTH = 180;  // Increased from 120 to 180
-const int THUMBNAIL_HEIGHT = 100;     // Increased from 80 to 100
-const int THUMBNAIL_WIDTH = 180;      // Increased from 120 to 160
+const int RIGHT_SIDEBAR_WIDTH = 180; // Increased from 120 to 180
+const int THUMBNAIL_HEIGHT = 100;    // Increased from 80 to 100
+const int THUMBNAIL_WIDTH = 180;     // Increased from 120 to 160
 
 // Add to global variables
 float scrollOffset = 0.0f;
@@ -39,7 +37,7 @@ int selectedBottomTool = 1; // Track currently selected bottom tool (1 for penci
 int prevX = -1, prevY = -1;
 int circleCenterX = -1, circleCenterY = -1;
 int windowWidth = 800, windowHeight = 600;
-int tool = 1; // 1 for pencil, 2 for eraser
+int tool = 1;                            // 1 for pencil, 2 for eraser
 float currentColor[3] = {0.0, 0.0, 0.0}; // Initial color black
 int pointSize = 2;
 // square starting point variables
@@ -53,12 +51,11 @@ void mouseWheel(int wheel, int direction, int x, int y);
 bool isSidebarVisible = true; // Track the sidebar visibility state
 float sidebarPosition = 0.0f; // Animation state
 
-bool isRightSidebarVisible = false; // Right sidebar is closed by default
+bool isRightSidebarVisible = false;               // Right sidebar is closed by default
 float rightSidebarPosition = RIGHT_SIDEBAR_WIDTH; // Initial position for the closed state
 
 void toggleRightSidebar();
 void animateRightSidebar();
-
 
 // Structure to represent a line segment
 struct Line
@@ -103,13 +100,15 @@ typedef struct
 } Button;
 
 // Button callback functions
-void setPencilTool() {
+void setPencilTool()
+{
     tool = 1;
     selectedBottomTool = 0;
     glutPostRedisplay();
 }
 
-void setEraserTool() {
+void setEraserTool()
+{
     tool = 2;
     selectedBottomTool = 1;
     glutPostRedisplay();
@@ -132,7 +131,7 @@ void clearScreen()
 
 // Add these global variables
 static bool canAdjustSize = true;
-const int COOLDOWN_MS = 200;  // 200ms cooldown
+const int COOLDOWN_MS = 200; // 200ms cooldown
 
 void resetSizeAdjustFlag(int value)
 {
@@ -160,9 +159,6 @@ void decreasePointSize()
         glutPostRedisplay();
     }
 }
-
-
-
 
 void undoLastStroke()
 {
@@ -221,33 +217,32 @@ void drawText(int x, int y, const char *text)
 }
 
 Button buttons[] =
-{
-    {10, 10, 100, 25, "<<", toggleSidebar},
-    {10, 40, 100, 25, "PENCIL (P)", setPencilTool},
-    {10, 80, 100, 25, "ERASER (E)", setEraserTool},
-    {10, 120, 100, 25, "CIRCLE (C)", setCircleTool},
-    {10, 160, 100, 25, "SQUARE (S)", setSquareTool},
-    {10, 200, 100, 25, "UNDO (U)", undoLastStroke},
-    {10, 240, 100, 25, "CLEAR", clearScreen},
-    {30, 280, 30, 25, "+", increasePointSize},
-    {70, 280, 30, 25, "-", decreasePointSize},
-    {windowWidth - RIGHT_SIDEBAR_WIDTH + 10, 10, 100, 25, "<", toggleRightSidebar}
+    {
+        {10, 10, 100, 25, "<<", toggleSidebar},
+        {10, 40, 100, 25, "PENCIL (P)", setPencilTool},
+        {10, 80, 100, 25, "ERASER (E)", setEraserTool},
+        {10, 120, 100, 25, "CIRCLE (C)", setCircleTool},
+        {10, 160, 100, 25, "SQUARE (S)", setSquareTool},
+        {10, 200, 100, 25, "UNDO (U)", undoLastStroke},
+        {10, 240, 100, 25, "CLEAR", clearScreen},
+        {30, 280, 30, 25, "+", increasePointSize},
+        {70, 280, 30, 25, "-", decreasePointSize},
+        {windowWidth - RIGHT_SIDEBAR_WIDTH + 10, 10, 100, 25, "<", toggleRightSidebar}
 
 };
 int numButtons = 10;
 
 // Use the existing Button struct for bottom buttons
 Button bottomButtons[] =
-{
-    {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", setPencilTool},
-    {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", setEraserTool},
-    {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", clearScreen},
-    {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", deleteCurrentBoard}
-};
+    {
+        {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", setPencilTool},
+        {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", setEraserTool},
+        {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", clearScreen},
+        {0, 0, BOTTOM_BUTTON_SIZE, BOTTOM_BUTTON_SIZE, "", deleteCurrentBoard}};
 const int NUM_BOTTOM_BUTTONS = 4;
 
 // Function to draw the rotated clear button icon
-void drawRotatedClearButtonIcon(Button* b)
+void drawRotatedClearButtonIcon(Button *b)
 {
     glPushMatrix();
     glTranslatef(b->x + 20, b->y + 20, 0);
@@ -280,12 +275,12 @@ void drawRotatedClearButtonIcon(Button* b)
     glPopMatrix();
 }
 
-void drawIcon(Button* b, int iconType)
+void drawIcon(Button *b, int iconType)
 {
     glColor3f(0.0, 0.0, 0.0);
     glLineWidth(2.0);
 
-    switch(iconType)
+    switch (iconType)
     {
     case 0: // Pencil (head downwards and more pointed)
         // Pencil body
@@ -312,7 +307,7 @@ void drawIcon(Button* b, int iconType)
         glVertex2i(b->x + 28, b->y + 25);
         glVertex2i(b->x + 12, b->y + 25);
         glEnd();
-// Draw rounded part
+        // Draw rounded part
         glBegin(GL_POLYGON);
         for (int i = 0; i <= 360; i++)
         {
@@ -322,7 +317,7 @@ void drawIcon(Button* b, int iconType)
         glEnd();
         break;
 
-    case 2: // Clear (cleaning brush icon)
+    case 2:                            // Clear (cleaning brush icon)
         drawRotatedClearButtonIcon(b); // Draw the larger clear button icon at a fixed 45 degree angle with white lines
         break;
 
@@ -352,21 +347,27 @@ void drawIcon(Button* b, int iconType)
 
 void drawButton(Button *b);
 
-
 // Modify drawBottomToolbar function
-void drawBottomToolbar() {
-    for (int i = 0; i < NUM_BOTTOM_BUTTONS; i++) {
+void drawBottomToolbar()
+{
+    for (int i = 0; i < NUM_BOTTOM_BUTTONS; i++)
+    {
         // Draw button background
         bool isSelected = false;
 
         // Check if button should be highlighted
-        if (i == 0) isSelected = (tool == 1); // Pencil
-        if (i == 1) isSelected = (tool == 2); // Eraser
+        if (i == 0)
+            isSelected = (tool == 1); // Pencil
+        if (i == 1)
+            isSelected = (tool == 2); // Eraser
 
         // Set background color based on selection state
-        if (isSelected) {
+        if (isSelected)
+        {
             glColor3f(1.0, 0.7, 0.6); // Darker highlight color
-        } else {
+        }
+        else
+        {
             glColor3f(1.0, 0.84, 0.77); // Original color
         }
 
@@ -394,8 +395,6 @@ void drawBottomToolbar() {
     }
 }
 
-
-
 void updateBottomButtonPositions()
 {
     int totalWidth = NUM_BOTTOM_BUTTONS * BOTTOM_BUTTON_SIZE +
@@ -410,8 +409,6 @@ void updateBottomButtonPositions()
 }
 
 Button smallToggleButton = {5, 10, 30, 25, ">", toggleSidebar};
-
-
 
 void createNewBoard()
 {
@@ -434,7 +431,7 @@ void createNewBoard()
     newBoard.name = "Board " + toString(boards.size() + 1) + "/5";
     newBoard.pointSize = 2;
     newBoard.tool = 1;
-    newBoard.strokes.clear();  // Ensure strokes are empty
+    newBoard.strokes.clear(); // Ensure strokes are empty
     memcpy(newBoard.currentColor, currentColor, sizeof(float) * 3);
 
     // Add new board and switch to it
@@ -446,8 +443,6 @@ void createNewBoard()
 
     glutPostRedisplay();
 }
-
-
 
 void switchToBoard(int index)
 {
@@ -486,7 +481,7 @@ void drawBoardThumbnail(int index, int x, int y)
     // Draw border
     if (index == currentBoardIndex)
     {
-        glColor3f(0.0, 0.7, 1.0);  // Highlight current board
+        glColor3f(0.0, 0.7, 1.0); // Highlight current board
         glLineWidth(2.0);
     }
     else
@@ -508,18 +503,16 @@ void drawBoardThumbnail(int index, int x, int y)
     drawText(x + 5, y + THUMBNAIL_HEIGHT + 15, boardName.c_str());
 }
 
-
-
 void handleBoardClick(int x, int y)
 {
-    float yOffset = 50 + scrollOffset;  // Start from the adjusted offset
+    float yOffset = 50 + scrollOffset; // Start from the adjusted offset
 
     // Check existing board clicks
     for (size_t i = 0; i < boards.size(); i++)
     {
         if (y >= yOffset && y <= yOffset + THUMBNAIL_HEIGHT &&
-                x >= windowWidth - RIGHT_SIDEBAR_WIDTH + 10 &&
-                x <= windowWidth - RIGHT_SIDEBAR_WIDTH + THUMBNAIL_WIDTH - 10)
+            x >= windowWidth - RIGHT_SIDEBAR_WIDTH + 10 &&
+            x <= windowWidth - RIGHT_SIDEBAR_WIDTH + THUMBNAIL_WIDTH - 10)
         {
             switchToBoard(i);
             return;
@@ -528,21 +521,17 @@ void handleBoardClick(int x, int y)
     }
 
     // Check "+ New Board" button click
-    if (boards.size() < 5)    // Only if we can add more boards
+    if (boards.size() < 5) // Only if we can add more boards
     {
         if (y >= yOffset && y <= yOffset + 25 &&
-                x >= windowWidth - RIGHT_SIDEBAR_WIDTH + 10 + rightSidebarPosition &&
-                x <= windowWidth - RIGHT_SIDEBAR_WIDTH + 90 + rightSidebarPosition)
+            x >= windowWidth - RIGHT_SIDEBAR_WIDTH + 10 + rightSidebarPosition &&
+            x <= windowWidth - RIGHT_SIDEBAR_WIDTH + 90 + rightSidebarPosition)
         {
             createNewBoard();
             return;
         }
     }
 }
-
-
-
-
 
 // Function to toggle the sidebar visibility
 void toggleSidebar()
@@ -568,7 +557,6 @@ void animateSidebar()
     }
 }
 
-
 void toggleRightSidebar()
 {
     isRightSidebarVisible = !isRightSidebarVisible;
@@ -591,9 +579,6 @@ void animateRightSidebar()
         glutIdleFunc(NULL);
     }
 }
-
-
-
 
 void drawBoldText(int x, int y, const char *text, int boldness)
 {
@@ -657,7 +642,7 @@ bool isInsideCircle(int x, int y, int centerX, int centerY, int radius)
 }
 
 // Helper function to convert HSV to RGB
-void HSVtoRGB(float h, float s, float v, float& r, float& g, float& b)
+void HSVtoRGB(float h, float s, float v, float &r, float &g, float &b)
 {
     if (s == 0)
     {
@@ -710,14 +695,14 @@ void HSVtoRGB(float h, float s, float v, float& r, float& g, float& b)
 // Modified color picker drawing function
 void drawColorPicker()
 {
-    int centerX = 60;  // Center of the color wheel
+    int centerX = 60; // Center of the color wheel
     int centerY = windowHeight - 150;
     int radius = 50;   // Radius of the color wheel
     int segments = 32; // Number of segments for smooth circle
 
     // Draw color wheel
     glBegin(GL_TRIANGLE_FAN);
-    glColor3f(1.0, 1.0, 1.0);  // Center white
+    glColor3f(1.0, 1.0, 1.0); // Center white
     glVertex2f(centerX, centerY);
 
     for (int i = 0; i <= segments; i++)
@@ -735,7 +720,7 @@ void drawColorPicker()
 
     // Draw border
     glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);  // Changed from GL_LINE to GL_LINE_LOOP
+    glBegin(GL_LINE_LOOP); // Changed from GL_LINE to GL_LINE_LOOP
     for (int i = 0; i <= segments; i++)
     {
         float angle = 2.0f * M_PI * i / segments;
@@ -748,10 +733,10 @@ void drawColorPicker()
     // Draw current color preview
     glBegin(GL_QUADS);
     glColor3fv(currentColor);
-    glVertex2i(10, windowHeight-80);
-    glVertex2i(110, windowHeight-80);
-    glVertex2i(110, windowHeight-50);
-    glVertex2i(10, windowHeight-50);
+    glVertex2i(10, windowHeight - 80);
+    glVertex2i(110, windowHeight - 80);
+    glVertex2i(110, windowHeight - 50);
+    glVertex2i(10, windowHeight - 50);
     glEnd();
 }
 
@@ -760,10 +745,10 @@ void drawStrokes()
 {
     for (size_t i = 0; i < strokes.size(); i++)
     {
-        const Stroke& stroke = strokes[i];
+        const Stroke &stroke = strokes[i];
         for (size_t j = 0; j < stroke.lines.size(); j++)
         {
-            const Line& line = stroke.lines[j];
+            const Line &line = stroke.lines[j];
             if (line.isEraser)
             {
                 glColor3f(1.0, 1.0, 1.0);
@@ -785,7 +770,7 @@ void drawStrokes()
 void handleButtonClick(int x, int y)
 {
     if (y >= windowHeight - BOTTOM_MARGIN - BOTTOM_BUTTON_HEIGHT &&
-            y <= windowHeight - BOTTOM_MARGIN)
+        y <= windowHeight - BOTTOM_MARGIN)
     {
         for (int i = 0; i < NUM_BOTTOM_BUTTONS; i++)
         {
@@ -807,7 +792,7 @@ void handleButtonClick(int x, int y)
         {
             Button *b = &buttons[i];
             if (x > b->x + sidebarPosition && x < b->x + b->w + sidebarPosition &&
-                    y > b->y && y < b->y + b->h)
+                y > b->y && y < b->y + b->h)
             {
                 if (b->callbackFunction)
                 {
@@ -821,7 +806,7 @@ void handleButtonClick(int x, int y)
     {
         float adjustedX = sidebarPosition + 120;
         if (x > adjustedX && x < adjustedX + smallToggleButton.w &&
-                y > smallToggleButton.y && y < smallToggleButton.y + smallToggleButton.h)
+            y > smallToggleButton.y && y < smallToggleButton.y + smallToggleButton.h)
         {
             toggleSidebar();
         }
@@ -832,7 +817,7 @@ void handleButtonClick(int x, int y)
     {
         // Check click area for the small toggle button
         if (x >= windowWidth - 40 && x <= windowWidth - 10 &&
-                y >= 10 && y <= 35)
+            y >= 10 && y <= 35)
         {
             toggleRightSidebar();
             return;
@@ -843,16 +828,13 @@ void handleButtonClick(int x, int y)
         // Check click area for the expanded toggle button
         float adjustedX = windowWidth - RIGHT_SIDEBAR_WIDTH + rightSidebarPosition;
         if (x >= adjustedX + 10 && x <= adjustedX + 110 &&
-                y >= 10 && y <= 35)
+            y >= 10 && y <= 35)
         {
             toggleRightSidebar();
             return;
         }
     }
 }
-
-
-
 
 void handleColorPickerClick(int x, int y)
 {
@@ -921,13 +903,13 @@ void mouseWheel(int wheel, int direction, int x, int y)
 {
     if (x >= windowWidth - RIGHT_SIDEBAR_WIDTH)
     {
-        if (direction > 0)   // Scroll up
+        if (direction > 0) // Scroll up
         {
             scrollOffset += SCROLL_SPEED;
             if (scrollOffset > 0)
                 scrollOffset = 0;
         }
-        else     // Scroll down
+        else // Scroll down
         {
             float maxScroll = -(totalContentHeight - windowHeight + 20);
             scrollOffset -= SCROLL_SPEED;
@@ -935,6 +917,27 @@ void mouseWheel(int wheel, int direction, int x, int y)
                 scrollOffset = maxScroll;
         }
         glutPostRedisplay();
+    }
+}
+
+// Function to get drawing area based on sidebar visibility
+void getDrawingArea(int &drawX, int &drawWidth)
+{
+    // Default drawing area starts at (0, windowWidth)
+    drawX = 0;
+    drawWidth = windowWidth;
+
+    // If left sidebar is hidden, adjust the drawing area
+    if (isSidebarVisible == true)
+    {
+        drawX += 120;     // Assuming sidebar width is 120
+        drawWidth -= 120; // Reduce drawing width
+    }
+
+    // If right sidebar is hidden, adjust the drawing area
+    if (isRightSidebarVisible == true)
+    {
+        drawWidth -= RIGHT_SIDEBAR_WIDTH; // Reduce drawing width by right sidebar width
     }
 }
 
@@ -948,42 +951,49 @@ void mouseButton(int button, int state, int x, int y)
     if (state == GLUT_DOWN)
     {
         // Handle right sidebar interactions
-        if (x >= windowWidth - RIGHT_SIDEBAR_WIDTH)
+        if (isRightSidebarVisible)
         {
-            // Mouse wheel scrolling
-            if (button == 3)   // Mouse wheel up
+            if (x >= windowWidth - RIGHT_SIDEBAR_WIDTH)
             {
-                scrollOffset += SCROLL_SPEED;
-                if (scrollOffset > 0)
-                    scrollOffset = 0;
-                glutPostRedisplay();
+                // Mouse wheel scrolling
+                if (button == 3) // Mouse wheel up
+                {
+                    scrollOffset += SCROLL_SPEED;
+                    if (scrollOffset > 0)
+                        scrollOffset = 0;
+                    glutPostRedisplay();
+                    return;
+                }
+                else if (button == 4) // Mouse wheel down
+                {
+                    float maxScroll = -(totalContentHeight - windowHeight + 20);
+                    scrollOffset -= SCROLL_SPEED;
+                    if (scrollOffset < maxScroll)
+                        scrollOffset = maxScroll;
+                    glutPostRedisplay();
+                    return;
+                }
+                handleBoardClick(x, y);
                 return;
             }
-            else if (button == 4)     // Mouse wheel down
-            {
-                float maxScroll = -(totalContentHeight - windowHeight + 20);
-                scrollOffset -= SCROLL_SPEED;
-                if (scrollOffset < maxScroll)
-                    scrollOffset = maxScroll;
-                glutPostRedisplay();
-                return;
-            }
-            handleBoardClick(x, y);
-            return;
         }
 
         // Handle left sidebar interactions
-        if (x < 120)
+        if (isSidebarVisible)
         {
-            if(isSidebarVisible){
-                    handleButtonClick(x, y);
-                    handleColorPickerClick(x, y);
+            if (x < 120)
+            {
+                handleButtonClick(x, y);
+                handleColorPickerClick(x, y);
+                return;
             }
-            return;
         }
 
+        // calculate the drawing area
+        int drawX, drawWidth;
+        getDrawingArea(drawX, drawWidth);
         // Handle drawing area interactions
-        if (x > 120 && x < windowWidth - RIGHT_SIDEBAR_WIDTH)
+        if (x >= drawX && x <= (drawX + drawWidth))
         {
             prevX = x;
             prevY = y;
@@ -1083,37 +1093,17 @@ void mouseButton(int button, int state, int x, int y)
     }
 }
 
-
-// Function to get drawing area based on sidebar visibility
-void getDrawingArea(int &drawX, int &drawWidth) {
-    // Default drawing area starts at (0, windowWidth)
-    drawX = 0;
-    drawWidth = windowWidth;
-
-    // If left sidebar is hidden, adjust the drawing area
-    if (isSidebarVisible == true) {
-        drawX += 120; // Assuming sidebar width is 120
-        drawWidth -= 120; // Reduce drawing width
-    }
-
-    // If right sidebar is hidden, adjust the drawing area
-    if (isRightSidebarVisible == true) {
-        drawWidth -= RIGHT_SIDEBAR_WIDTH; // Reduce drawing width by right sidebar width
-    }
-}
-
-
-
 void display();
 
 // Mouse motion callback
 void mouseMotion(int x, int y)
 {
-        int drawX, drawWidth;
-        getDrawingArea(drawX, drawWidth);
+    int drawX, drawWidth;
+    getDrawingArea(drawX, drawWidth);
 
     // Check if x is within the drawing area
-        if (prevX != -1 && prevY != -1 && x >= drawX && x <= (drawX + drawWidth)) {
+    if (prevX != -1 && prevY != -1 && x >= drawX && x <= (drawX + drawWidth))
+    {
 
         if (tool == 3 && circleCenterX != -1 && circleCenterY != -1)
         {
@@ -1188,7 +1178,6 @@ void mouseMotion(int x, int y)
     }
 }
 
-
 // Add to reshape function
 void reshape(int w, int h)
 {
@@ -1250,7 +1239,7 @@ void display()
 
         std::stringstream ss;
         ss << pointSize;
-        glColor3f(1.0, 1.0, 1.0);  // Set color to white
+        glColor3f(1.0, 1.0, 1.0); // Set color to white
         drawBoldText(10 + sidebarPosition, 298, ss.str().c_str(), 0.5);
         drawColorPicker();
     }
@@ -1267,7 +1256,7 @@ void display()
               RIGHT_SIDEBAR_WIDTH, windowHeight);
 
     // Draw board thumbnails
-    float yOffset = 50 + scrollOffset;  // Changed from 10 to 50
+    float yOffset = 50 + scrollOffset; // Changed from 10 to 50
     totalContentHeight = 0;
 
     for (size_t i = 0; i < boards.size(); i++)
@@ -1305,10 +1294,9 @@ void display()
     else
     {
         Button toggleRightButton =
-        {
-            windowWidth - RIGHT_SIDEBAR_WIDTH + rightSidebarPosition + 10,
-            10, 100, 25, ">>", toggleRightSidebar
-        };
+            {
+                windowWidth - RIGHT_SIDEBAR_WIDTH + rightSidebarPosition + 10,
+                10, 100, 25, ">>", toggleRightSidebar};
         drawButton(&toggleRightButton);
     }
 
@@ -1320,9 +1308,6 @@ void display()
     drawBottomToolbar();
     glFlush();
 }
-
-
-
 
 // Initialize OpenGL settings
 void init()
@@ -1336,11 +1321,12 @@ void init()
 
     // Initialize with only one board
     createNewBoard();
-    isRightSidebarVisible = false;  // Ensure right sidebar starts closed
-    rightSidebarPosition = RIGHT_SIDEBAR_WIDTH;  // Set initial position to closed state
+    isRightSidebarVisible = false;              // Ensure right sidebar starts closed
+    rightSidebarPosition = RIGHT_SIDEBAR_WIDTH; // Set initial position to closed state
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(windowWidth, windowHeight);
