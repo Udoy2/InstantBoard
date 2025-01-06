@@ -975,8 +975,10 @@ void mouseButton(int button, int state, int x, int y)
         // Handle left sidebar interactions
         if (x < 120)
         {
-            handleButtonClick(x, y);
-            handleColorPickerClick(x, y);
+            if(isSidebarVisible){
+                    handleButtonClick(x, y);
+                    handleColorPickerClick(x, y);
+            }
             return;
         }
 
@@ -1082,7 +1084,23 @@ void mouseButton(int button, int state, int x, int y)
 }
 
 
+// Function to get drawing area based on sidebar visibility
+void getDrawingArea(int &drawX, int &drawWidth) {
+    // Default drawing area starts at (0, windowWidth)
+    drawX = 0;
+    drawWidth = windowWidth;
 
+    // If left sidebar is hidden, adjust the drawing area
+    if (isSidebarVisible == true) {
+        drawX += 120; // Assuming sidebar width is 120
+        drawWidth -= 120; // Reduce drawing width
+    }
+
+    // If right sidebar is hidden, adjust the drawing area
+    if (isRightSidebarVisible == true) {
+        drawWidth -= RIGHT_SIDEBAR_WIDTH; // Reduce drawing width by right sidebar width
+    }
+}
 
 
 
@@ -1091,8 +1109,12 @@ void display();
 // Mouse motion callback
 void mouseMotion(int x, int y)
 {
-    if (prevX != -1 && prevY != -1 && x > 120 && x < windowWidth - RIGHT_SIDEBAR_WIDTH)
-    {
+        int drawX, drawWidth;
+        getDrawingArea(drawX, drawWidth);
+
+    // Check if x is within the drawing area
+        if (prevX != -1 && prevY != -1 && x >= drawX && x <= (drawX + drawWidth)) {
+
         if (tool == 3 && circleCenterX != -1 && circleCenterY != -1)
         {
             // Draw all existing content
