@@ -875,6 +875,10 @@ void keyboard(unsigned char key, int x, int y)
         setPencilTool();
         glutPostRedisplay();
         break;
+    case 'd':
+        deleteCurrentBoard();
+        glutPostRedisplay();
+        break;
     case 'e':
         setEraserTool();
         glutPostRedisplay();
