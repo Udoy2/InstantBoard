@@ -4,7 +4,7 @@
 	<GL/glu.h>
 	<GL/glut.h>
 
-1735391556 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
+976645372 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
 	<windows.h>
 	<GL/gl.h>
 	<GL/glu.h>
@@ -228,7 +228,7 @@
 	<cstring>
 	<cmath>
 
-1735975154 source:c:\users\user\instantboard\main.cpp
+1736567740 source:c:\users\user\instantboard\main.cpp
 	<GL/gl.h>
 	<GL/glu.h>
 	<GL/glut.h>
