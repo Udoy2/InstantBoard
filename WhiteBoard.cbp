@@ -42,6 +42,7 @@
 			<Add library="gdi32" />
 			<Add directory="C:/Program Files (x86)/CodeBlocks/MinGW/lib" />
 		</Linker>
+		<Unit filename="firebase_client.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />
