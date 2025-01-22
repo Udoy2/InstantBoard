@@ -6,7 +6,7 @@ Welcome to **InstantBoard**, a collaborative drawing application that allows mul
 ## 🎥 Video Demonstration
 
 <video width="640" height="360" controls>
-  <source src="./assets/demonstration.m4v" type="video/mp4">
+  <source src="https://github.com/Udoy2/InstantBoard/blob/main/assets/demonstration.m4v" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
