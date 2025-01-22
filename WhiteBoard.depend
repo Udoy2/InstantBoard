@@ -4,7 +4,7 @@
 	<GL/glu.h>
 	<GL/glut.h>
 
-1735391556 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
+1735289700 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
 	<windows.h>
 	<GL/gl.h>
 	<GL/glu.h>
@@ -250,4 +250,23 @@
 	<cstring>
 	<cmath>
 	<math.h>
+
+1737560272 source:d:\drive_d_3_file_7_programming\projects_and_work\instantboard\main.cpp
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	<sstream>
+	<vector>
+	<cstring>
+	<cmath>
+	<math.h>
+	<iostream>
+	<thread>
+	<chrono>
+	<mutex>
+	<winsock2.h>
+	<ws2tcpip.h>
+
+1301111164 c:\program files (x86)\codeblocks\mingw\include\ws2tcpip.h
+	<winsock2.h>
 

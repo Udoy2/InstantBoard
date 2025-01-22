@@ -3,6 +3,13 @@
 Welcome to **InstantBoard**, a collaborative drawing application that allows multiple users to draw, erase, and create shapes in real-time! This project is built using **OpenGL** for rendering and **Winsock** for networking, making it a fun and interactive tool for creative collaboration.
 
 ---
+## 🎥 Video Demonstration
+
+<video width="640" height="360" controls>
+  <source src="./assets/demonstration.m4v" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 
 ## 🌟 Features
 
@@ -107,6 +114,7 @@ InstantBoard.exe
   - `[` and `]`: Decrease or increase the brush size.
 
 ---
+
 
 ## 📂 Project Structure
 
