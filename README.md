@@ -5,11 +5,9 @@ Welcome to **InstantBoard**, a collaborative drawing application that allows mul
 ---
 ## 🎥 Video Demonstration
 
-Check out the video demonstration of InstantBoard in action:
+Watch the video demonstration of InstantBoard on YouTube:
 
-
-
-<video src='./assets/demonstration.mp4' width=640 controls> </video>
+[![Watch the Video](https://img.youtube.com/vi/pWmPni4wvWg/0.jpg)](https://www.youtube.com/watch?v=pWmPni4wvWg)
 
 
 
