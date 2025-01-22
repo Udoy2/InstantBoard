@@ -7,7 +7,9 @@ Welcome to **InstantBoard**, a collaborative drawing application that allows mul
 
 Check out the video demonstration of InstantBoard in action:
 
+
 ![InstantBoard Demonstration](./assets/demonstration.gif)
+
 
 
 ## 🌟 Features
