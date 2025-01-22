@@ -7,7 +7,9 @@ Welcome to **InstantBoard**, a collaborative drawing application that allows mul
 
 Check out the video demonstration of InstantBoard in action:
 
-<video src='[your URL here](https://github.com/Udoy2/InstantBoard/blob/main/assets/demonstration.m4v)' width=640/>
+
+
+<video src='./assets/demonstration.mp4' width=640 controls> </video>
 
 
 
