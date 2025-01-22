@@ -5,10 +5,9 @@ Welcome to **InstantBoard**, a collaborative drawing application that allows mul
 ---
 ## 🎥 Video Demonstration
 
-<video width="640" height="360" controls>
-  <source src="https://github.com/Udoy2/InstantBoard/blob/main/assets/demonstration.m4v" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+Check out the video demonstration of InstantBoard in action:
+
+<iframe width="640" height="360" src="https://www.youtube.com/embed/pWmPni4wvWg?si=qE3groNy6tvDwDY" frameborder="0" allowfullscreen></iframe>
 
 
 ## 🌟 Features
