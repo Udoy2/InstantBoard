@@ -219,7 +219,7 @@
 	<stddef.h>
 	<GL/gl.h>
 
-1735402837 source:d:\drive d_3_file_7{programming}\projects_and_work\instantboard\main.cpp
+1735914626 source:d:\drive d_3_file_7{programming}\projects_and_work\instantboard\main.cpp
 	<GL/gl.h>
 	<GL/glu.h>
 	<GL/glut.h>
@@ -227,4 +227,46 @@
 	<vector>
 	<cstring>
 	<cmath>
+
+1735975154 source:c:\users\user\instantboard\main.cpp
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	<sstream>
+	<vector>
+	<cstring>
+	<cmath>
+	<math.h>
+
+1341006774 c:\program files (x86)\codeblocks\mingw\include\math.h
+	<_mingw.h>
+
+1736157026 source:d:\work_project_files\whiteboard\instantboard\main.cpp
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	<sstream>
+	<vector>
+	<cstring>
+	<cmath>
+	<math.h>
+
+1737560272 source:d:\drive_d_3_file_7_programming\projects_and_work\instantboard\main.cpp
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glut.h>
+	<sstream>
+	<vector>
+	<cstring>
+	<cmath>
+	<math.h>
+	<iostream>
+	<thread>
+	<chrono>
+	<mutex>
+	<winsock2.h>
+	<ws2tcpip.h>
+
+1301111164 c:\program files (x86)\codeblocks\mingw\include\ws2tcpip.h
+	<winsock2.h>
 
