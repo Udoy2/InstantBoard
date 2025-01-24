@@ -10,7 +10,7 @@
 #include <thread>
 #include <chrono>
 #include <mutex>
-
+#include <functional>
 #define _WIN32_WINNT 0x0601 // Windows 7 or later
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -23,7 +23,10 @@ void toggleSidebar();
 void animateSidebar();
 void animateRightSidebar();
 void toggleRightSidebar();
-
+void drawStrokes();
+void drawColorPicker();
+void display();
+void HSVtoRGB(float h, float s, float v, float &r, float &g, float &b);
 template <typename T>
 std::string toString(T value)
 {
@@ -31,6 +34,12 @@ std::string toString(T value)
     os << value;
     return os.str();
 }
+
+// Add these constants at the top of the file
+const int COLOR_SQUARE_SIZE = 30; // Size of each color square
+const int COLOR_GRID_COLUMNS = 3; // 3 columns
+const int COLOR_GRID_ROWS = 2;    // 2 rows
+const int COLOR_GRID_SPACING = 10; // Spacing between squares
 
 const int BOTTOM_TOOLBAR_HEIGHT = 60;
 const int BOTTOM_BUTTON_WIDTH = 80;
@@ -50,7 +59,7 @@ int selectedBottomTool = 1;
 
 int prevX = -1, prevY = -1;
 int circleCenterX = -1, circleCenterY = -1;
-int windowWidth = 800, windowHeight = 600;
+int windowWidth = 1000, windowHeight = 700;
 int tool = 1;
 float currentColor[3] = {0.0, 0.0, 0.0};
 int pointSize = 2;
@@ -103,7 +112,7 @@ typedef struct
 {
     int x, y, w, h;
     const char *label;
-    void (*callbackFunction)();
+    std::function<void()> callbackFunction;
 } Button;
 
 void setPencilTool()
@@ -208,6 +217,41 @@ void drawText(int x, int y, const char *text)
     while (*text)
     {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *text++);
+    }
+}
+
+// Define predefined colors
+const float predefinedColors[][3] = {
+    {1.0f, 0.0f, 0.0f}, // Red
+    {0.0f, 1.0f, 0.0f}, // Green
+    {0.0f, 0.0f, 1.0f}, // Blue
+    {1.0f, 1.0f, 0.0f}, // Yellow
+    {1.0f, 0.0f, 1.0f}, // Magenta
+    {0.0f, 1.0f, 1.0f}  // Cyan
+};
+
+const int NUM_PREDEFINED_COLORS = sizeof(predefinedColors) / sizeof(predefinedColors[0]);
+
+// Function to handle color button clicks
+void setColorFromPalette(int index)
+{
+    if (index >= 0 && index < NUM_PREDEFINED_COLORS)
+    {
+        memcpy(currentColor, predefinedColors[index], sizeof(float) * 3);
+        glutPostRedisplay();
+    }
+}
+
+// Add color buttons to the buttons array
+Button colorButtons[NUM_PREDEFINED_COLORS];
+
+void initColorButtons()
+{
+    for (int i = 0; i < NUM_PREDEFINED_COLORS; i++)
+    {
+        colorButtons[i] = {10, 320 + i * 30, 100, 25, "", []() {}};
+        colorButtons[i].callbackFunction = [i]()
+        { setColorFromPalette(i); };
     }
 }
 
@@ -325,8 +369,68 @@ void drawIcon(Button *b, int iconType)
         break;
     }
 }
+// Add the drawColorGrid function
+void drawColorGrid() {
+    int startX = 10 + sidebarPosition; // X position of the grid
+    int startY = windowHeight - 300;  // Y position of the grid (adjust as needed)
 
-void drawButton(Button *b);
+    for (int row = 0; row < COLOR_GRID_ROWS; row++) {
+        for (int col = 0; col < COLOR_GRID_COLUMNS; col++) {
+            int index = row * COLOR_GRID_COLUMNS + col;
+            if (index >= NUM_PREDEFINED_COLORS) break; // Stop if we run out of colors
+
+            // Calculate the position of the current square
+            int x = startX + col * (COLOR_SQUARE_SIZE + COLOR_GRID_SPACING);
+            int y = startY + row * (COLOR_SQUARE_SIZE + COLOR_GRID_SPACING);
+
+            // Draw the square with the predefined color
+            glColor3fv(predefinedColors[index]);
+            glBegin(GL_QUADS);
+            glVertex2i(x, y);
+            glVertex2i(x + COLOR_SQUARE_SIZE, y);
+            glVertex2i(x + COLOR_SQUARE_SIZE, y + COLOR_SQUARE_SIZE);
+            glVertex2i(x, y + COLOR_SQUARE_SIZE);
+            glEnd();
+
+            // Draw a border around the square
+            glColor3f(0.0, 0.0, 0.0); // Black border
+            glLineWidth(1.0);
+            glBegin(GL_LINE_LOOP);
+            glVertex2i(x, y);
+            glVertex2i(x + COLOR_SQUARE_SIZE, y);
+            glVertex2i(x + COLOR_SQUARE_SIZE, y + COLOR_SQUARE_SIZE);
+            glVertex2i(x, y + COLOR_SQUARE_SIZE);
+            glEnd();
+        }
+    }
+}
+
+void drawButton(Button *b)
+{
+    glColor3f(1.0, 0.84, 0.77);
+    glBegin(GL_QUADS);
+    glVertex2i(b->x, b->y);
+    glVertex2i(b->x + b->w, b->y);
+    glVertex2i(b->x + b->w, b->y + b->h);
+    glVertex2i(b->x, b->y + b->h);
+    glEnd();
+
+    GLfloat currentWidth;
+    glGetFloatv(GL_LINE_WIDTH, &currentWidth);
+
+    glLineWidth(1.0);
+    glColor3f(0.0, 0.0, 0.0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2i(b->x, b->y);
+    glVertex2i(b->x + b->w, b->y);
+    glVertex2i(b->x + b->w, b->y + b->h);
+    glVertex2i(b->x, b->y + b->h);
+    glEnd();
+
+    glLineWidth(currentWidth);
+    glColor3f(0.0, 0.0, 0.0);
+    drawText(b->x + 10, b->y + 15, b->label);
+}
 
 void drawBottomToolbar()
 {
@@ -465,6 +569,31 @@ void drawBoardThumbnail(int index, int x, int y)
     std::string boardName = "Board " + toString(index + 1) + "/5";
     drawText(x + 5, y + THUMBNAIL_HEIGHT + 15, boardName.c_str());
 }
+// Add the handleColorGridClick function
+void handleColorGridClick(int x, int y) {
+    int startX = 10 + sidebarPosition; // X position of the grid
+    int startY = windowHeight - 300;  // Y position of the grid (adjust as needed)
+
+    for (int row = 0; row < COLOR_GRID_ROWS; row++) {
+        for (int col = 0; col < COLOR_GRID_COLUMNS; col++) {
+            int index = row * COLOR_GRID_COLUMNS + col;
+            if (index >= NUM_PREDEFINED_COLORS) break; // Stop if we run out of colors
+
+            // Calculate the bounds of the current square
+            int squareX = startX + col * (COLOR_SQUARE_SIZE + COLOR_GRID_SPACING);
+            int squareY = startY + row * (COLOR_SQUARE_SIZE + COLOR_GRID_SPACING);
+
+            // Check if the click is inside the square
+            if (x >= squareX && x <= squareX + COLOR_SQUARE_SIZE &&
+                y >= squareY && y <= squareY + COLOR_SQUARE_SIZE) {
+                // Set the current color to the color of the clicked square
+                memcpy(currentColor, predefinedColors[index], sizeof(float) * 3);
+                glutPostRedisplay(); // Redraw the screen to reflect the new color
+                return;
+            }
+        }
+    }
+}
 
 void handleBoardClick(int x, int y)
 {
@@ -555,91 +684,6 @@ void drawBoldText(int x, int y, const char *text, int boldness)
         }
     }
 }
-
-void drawButton(Button *b)
-{
-    glColor3f(1.0, 0.84, 0.77);
-    glBegin(GL_QUADS);
-    glVertex2i(b->x, b->y);
-    glVertex2i(b->x + b->w, b->y);
-    glVertex2i(b->x + b->w, b->y + b->h);
-    glVertex2i(b->x, b->y + b->h);
-    glEnd();
-
-    GLfloat currentWidth;
-    glGetFloatv(GL_LINE_WIDTH, &currentWidth);
-
-    glLineWidth(1.0);
-    glColor3f(0.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);
-    glVertex2i(b->x, b->y);
-    glVertex2i(b->x + b->w, b->y);
-    glVertex2i(b->x + b->w, b->y + b->h);
-    glVertex2i(b->x, b->y + b->h);
-    glEnd();
-
-    glLineWidth(currentWidth);
-    glColor3f(0.0, 0.0, 0.0);
-    drawText(b->x + 10, b->y + 15, b->label);
-}
-
-bool isInsideCircle(int x, int y, int centerX, int centerY, int radius)
-{
-    int dx = x - centerX;
-    int dy = y - centerY;
-    return (dx * dx + dy * dy) <= (radius * radius);
-}
-
-void HSVtoRGB(float h, float s, float v, float &r, float &g, float &b)
-{
-    if (s == 0)
-    {
-        r = g = b = v;
-        return;
-    }
-
-    h = h * 6.0f;
-    int i = floor(h);
-    float f = h - i;
-    float p = v * (1 - s);
-    float q = v * (1 - s * f);
-    float t = v * (1 - s * (1 - f));
-
-    switch (i % 6)
-    {
-    case 0:
-        r = v;
-        g = t;
-        b = p;
-        break;
-    case 1:
-        r = q;
-        g = v;
-        b = p;
-        break;
-    case 2:
-        r = p;
-        g = v;
-        b = t;
-        break;
-    case 3:
-        r = p;
-        g = q;
-        b = v;
-        break;
-    case 4:
-        r = t;
-        g = p;
-        b = v;
-        break;
-    case 5:
-        r = v;
-        g = p;
-        b = q;
-        break;
-    }
-}
-
 void drawColorPicker()
 {
     int centerX = 60;
@@ -743,6 +787,9 @@ void handleButtonClick(int x, int y)
                 return;
             }
         }
+
+        // Handle color button clicks
+        handleColorGridClick(x, y);
     }
     else
     {
@@ -775,6 +822,60 @@ void handleButtonClick(int x, int y)
     }
 }
 
+bool isInsideCircle(int x, int y, int centerX, int centerY, int radius) {
+    int dx = x - centerX;
+    int dy = y - centerY;
+    return (dx * dx + dy * dy) <= (radius * radius);
+}
+void HSVtoRGB(float h, float s, float v, float &r, float &g, float &b)
+{
+    if (s == 0)
+    {
+        r = g = b = v;
+        return;
+    }
+
+    h = h * 6.0f;
+    int i = floor(h);
+    float f = h - i;
+    float p = v * (1 - s);
+    float q = v * (1 - s * f);
+    float t = v * (1 - s * (1 - f));
+
+    switch (i % 6)
+    {
+    case 0:
+        r = v;
+        g = t;
+        b = p;
+        break;
+    case 1:
+        r = q;
+        g = v;
+        b = p;
+        break;
+    case 2:
+        r = p;
+        g = v;
+        b = t;
+        break;
+    case 3:
+        r = p;
+        g = q;
+        b = v;
+        break;
+    case 4:
+        r = t;
+        g = p;
+        b = v;
+        break;
+    case 5:
+        r = v;
+        g = p;
+        b = q;
+        break;
+    }
+}
 void handleColorPickerClick(int x, int y)
 {
     int centerX = 60;
@@ -1026,9 +1127,6 @@ void mouseButton(int button, int state, int x, int y)
         }
     }
 }
-
-void display();
-
 void mouseMotion(int x, int y)
 {
     int drawX, drawWidth;
@@ -1104,13 +1202,24 @@ void mouseMotion(int x, int y)
         }
     }
 }
+void reshape(int w, int h) {
+    const int MIN_HEIGHT = 650; // Minimum height for the window
 
-void reshape(int w, int h)
-{
+    // If the height is less than the minimum, reset the window size
+    if (h < MIN_HEIGHT) {
+        h = MIN_HEIGHT; // Set height to the minimum
+        w = static_cast<int>(static_cast<float>(windowWidth) / windowHeight * MIN_HEIGHT); // Adjust width proportionally
+        glutReshapeWindow(w, h); // Resize the window
+    }
+
+    // Update the window dimensions
     windowWidth = w;
     windowHeight = h;
+
+    // Update the bottom button positions
     updateBottomButtonPositions();
 
+    // Set the viewport and projection matrix
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -1162,6 +1271,7 @@ void display()
         ss << pointSize;
         glColor3f(1.0, 1.0, 1.0);
         drawBoldText(10 + sidebarPosition, 298, ss.str().c_str(), 0.5);
+        drawColorGrid();
         drawColorPicker();
     }
     else
@@ -1238,6 +1348,8 @@ void init()
     createNewBoard();
     isRightSidebarVisible = false;
     rightSidebarPosition = RIGHT_SIDEBAR_WIDTH;
+
+    initColorButtons(); // Initialize color buttons
 }
 
 void cleanup()
